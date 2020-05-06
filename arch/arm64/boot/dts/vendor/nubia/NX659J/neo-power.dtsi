@@ -1,0 +1,113 @@
+//#include "../../qcom/kona-pmic-overlay.dtsi"
+
+
+&kona_mtp_batterydata{
+	#include "atl-4450-10a.dtsi"
+};
+
+&pm8150b_charger {
+	qcom,auto-recharge-soc = <99>;
+	qcom,auto-recharge-vbat-mv = <4400>;
+	qcom,float-option = <1>;
+	qcom,chg-term-src = <1>;
+	qcom,chg-term-current-ma = <(-400)>;
+	qcom,fcc-max-ua = <10000000>;
+	qcom,fv-max-uv = <4450000>;
+	qcom,usb-icl-ua = <5000000>;
+	
+	qcom,lcd-on-limit-enable;
+	qcom,lcd-on-limit-temp = <400>;
+	qcom,lcd-on-limit-fcc = <2000000>;
+};
+
+&pm8150b_fg {
+	qcom,fg-force-load-profile;
+	qcom,fg-sys-term-current = <(-900)>;
+	qcom,fg-cutoff-voltage = <3400>;
+	qcom,fg-esr-cal-temp-thresh = <10 45>;
+	nubia,use-default-batt-id = <15>;
+};
+
+&spmi_bus {
+	qcom,pm8150b@2 {
+		neo,battery {
+			compatible = "nubia,neo-battery";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			//reg = <0x1000 0x700>;
+			neo,batt-capacity-uah = <4500000>;
+			neo,batt-cutoff-mv = <3450>;
+			neo,batt-soc-increase-per-sec = <10>;
+			neo,batt-soc-decrease-per-sec = <60>;
+		};
+	};
+};
+
+&qupv3_se15_i2c{
+	status = "okay";
+	pca9468@57 {
+		compatible = "nxp,pca9468";
+		reg = <0x57>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <138 0x2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pca9468_master_int_default>;
+		
+		usbpd-phy = <&pm8150b_pdphy>;
+		pca9468,lcd-on-limit-enable;
+		pca9468,lcd-on-limit-temp = <400>;
+		pca9468,lcd-on-limit-fcc = <2000000>;
+		pca9468,irq-gpio = <&tlmm 138 0x02>;
+		pca9468,input-current-limit = <5000000>; /* 2.0A */
+		pca9468,charging-current = <6000000>; /* 6A */
+		pca9468,float-voltage = <4400000>; /* 4.40V */
+		pca9468,input-itopoff = <750000>; /* 500mA */
+		pca9468,sense-resistance = <1>; /* 10mOhm */
+		pca9468,switching-frequency = <3>; /* 980KHz */
+		pca9468,ntc-threshold = <0>; /* 2.4V */
+		pca9468,chg-mode = <1>; /* 2:1 direct charging mode */
+		pca9468,parallel = <1>; /* Support parallel charging */
+		pca9468,sub-i2c-addr = <0x5E>;	/* I2C slave address for sub charger - ADD pin pulled HIGH */
+		pca9468,parallel-threshold = <1500000>; /* 1.5A */
+		pca9468,step-chg-ranges = <0  28  5000000
+								   29 50  4000000
+								   51 75  3000000
+								   76 79  2800000
+								   80 82  2600000
+								   83 85  2400000
+								   86 88  2200000
+								   89 91  1900000
+								   92 93  1600000
+								   94 95  1300000
+                                   96 100 1100000>;
+		pca9468,jeita-fcc-ranges = <0   100  600000
+								    101 150  2200000
+								    151 415  5000000
+								    416 425  4000000
+								    426 440  3000000
+								    441 530  1100000
+								    531 1000 0>;
+		pca9468,jeita-fv-ranges = <0   100 4450000
+								  101 150  4450000
+								  151 415  4450000
+								  416 425  4450000
+								  426 440  4450000
+								  441 530  4100000
+								  531 1000 4100000>;
+	};
+};
+&tlmm {
+	pca9468_int_default_pin {
+		pca9468_master_int_default: pca9468_master_int_default {
+			muex {
+				pins = "gpio138";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio138";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+	};
+};

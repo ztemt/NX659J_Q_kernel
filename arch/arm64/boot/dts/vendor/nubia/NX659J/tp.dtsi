@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&qupv3_se13_i2c {
+		status = "okay";
+                synaptics_dsx@20 {
+                        compatible = "synaptics,dsx-i2c";
+                        reg = <0x20>;
+                        interrupt-parent = <&tlmm>;
+                        interrupts = <39 0x2008>;
+			            vdd-supply = <&pm8150a_l1>;
+                        avdd-supply = <&pm8150_l13>;
+                        pinctrl-names = "pmx_ts_active", "pmx_ts_int_suspend";
+                        pinctrl-0 = <&ts_active>;
+                        pinctrl-1 = <&ts_int_suspend>;
+                        synaptics,pwr-reg-name = "avdd"; //3.3v
+			            synaptics,bus-reg-name = "vdd"; // 1.8v
+                        synaptics,power-gpio = <&pm8150a_l1>;
+						//synaptics,power-gpio = <&vdd>;			
+                        synaptics,power-on-state = <1>;
+                        synaptics,power-delay-ms = <200>;
+                        synaptics,reset-active-ms = <20>;
+                        synaptics,reset-delay-ms = <100>;
+                        synaptics,ub-i2c-addr = <0x20>;
+                        synaptics,irq-gpio = <&tlmm 39 0x2008>;
+                        synaptics,reset-gpio = <&tlmm 38 0x0>;
+                        synaptics,firmware-image-name = "nubia_tp_jdi_fw.img";
+                        synaptics,irq-on-state = <0>;
+                        synaptics,reset-on-state = <0>;
+                };
+
+};
+

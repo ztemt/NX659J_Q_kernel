@@ -1,0 +1,171 @@
+&mdss_mdp {
+	dsi_r66455_1080p_amoled_cmd: qcom,nubia_dsi_r66455_1080p_amoled_cmd {
+		qcom,mdss-dsi-panel-name =
+			"r66455 amoled cmd mode dsi visionox panel with DSC";
+		qcom,mdss-dsi-panel-type = "dsi_cmd_mode";
+		qcom,mdss-dsi-panel-physical-type = "oled";
+		qcom,mdss-dsi-virtual-channel-id = <0>;
+		qcom,mdss-dsi-stream = <0>;
+		qcom,mdss-dsi-bpp = <24>;
+		qcom,mdss-dsi-color-order = "rgb_swap_rgb";
+		qcom,mdss-dsi-underflow-color = <0xff>;
+		qcom,mdss-dsi-border-color = <0>;
+
+		qcom,dsi-ctrl-num = <0>;
+		qcom,dsi-phy-num = <0>;
+
+		qcom,mdss-dsi-traffic-mode = "non_burst_sync_event";
+		qcom,mdss-dsi-lane-map = "lane_map_0123";
+		qcom,mdss-dsi-bllp-eof-power-mode;
+		qcom,mdss-dsi-bllp-power-mode;
+		qcom,mdss-dsi-lane-0-state;
+		qcom,mdss-dsi-lane-1-state;
+		qcom,mdss-dsi-lane-2-state;
+		qcom,mdss-dsi-lane-3-state;
+		qcom,mdss-dsi-dma-trigger = "trigger_sw";
+		qcom,mdss-dsi-mdp-trigger = "none";
+		qcom,mdss-dsi-reset-sequence = <1 10>, <0 10>, <1 10>;
+		qcom,mdss-dsi-te-pin-select = <1>;
+		qcom,mdss-dsi-wr-mem-start = <0x2c>;
+		qcom,mdss-dsi-wr-mem-continue = <0x3c>;
+		qcom,mdss-dsi-te-dcs-command = <1>;
+		qcom,mdss-dsi-te-check-enable;
+		qcom,mdss-dsi-te-using-te-pin;
+		qcom,mdss-dsi-panel-hdr-enabled;
+		qcom,mdss-dsi-panel-hdr-color-primaries = <14500 15500 32000
+			17000 15500 30000 8000 3000>;
+		qcom,mdss-dsi-panel-peak-brightness = <4200000>;
+		qcom,mdss-dsi-panel-blackness-level = <3230>;
+		qcom,mdss-dsi-qsync-min-refresh-rate = <55>;
+
+		qcom,mdss-pan-physical-width-dimension = <72>;
+		qcom,mdss-pan-physical-height-dimension = <156>;
+/*********************ESD CHECK***********************/
+		qcom,esd-check-enabled;	
+		qcom,mdss-dsi-panel-status-check-mode = "reg_read";	
+		qcom,mdss-dsi-panel-status-command = [06 01 00 01 05 00 01 0a];	
+		qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
+		qcom,mdss-dsi-panel-status-value = <0x1c>;
+		qcom,mdss-dsi-panel-status-read-length = <1>;
+/*********************ESD CHECK***********************/
+
+		qcom,mdss-dsi-display-timings {
+			timing@0 {
+				qcom,mdss-dsi-panel-framerate = <90>;
+				qcom,mdss-dsi-panel-width = <1080>;
+				qcom,mdss-dsi-panel-height = <2340>;
+				qcom,mdss-dsi-h-front-porch = <200>;
+				qcom,mdss-dsi-h-back-porch = <80>;
+				qcom,mdss-dsi-h-pulse-width = <1>;
+				qcom,mdss-dsi-h-sync-skew = <0>;
+				qcom,mdss-dsi-v-back-porch = <12>;
+				qcom,mdss-dsi-v-front-porch = <64>;
+				qcom,mdss-dsi-v-pulse-width = <1>;
+				qcom,mdss-dsi-h-left-border = <0>;
+				qcom,mdss-dsi-h-right-border = <0>;
+				qcom,mdss-dsi-v-top-border = <0>;
+				qcom,mdss-dsi-v-bottom-border = <0>;
+				qcom,mdss-mdp-transfer-time-us = <11111>;
+				qcom,mdss-dsi-panel-phy-timings = [00 1D 07 07 23 22 07 07 05 02 04 00 18 17];
+				qcom,display-topology = <1 1 1>;
+				qcom,mdss-dsi-panel-jitter = <0x3C 0x0a>;
+				qcom,default-topology-index = <0>;
+
+				qcom,mdss-dsi-on-command = [
+					39 01 00 00 00 00 02 b0 04
+					39 01 00 00 00 00 02 b0 00
+					39 01 00 00 00 00 02 b3 00
+					39 01 00 00 00 00 02 bb 5b
+					39 01 00 00 00 00 03 CB 00 00
+					39 01 00 00 00 00 03 CA 00 00
+					39 01 00 00 00 00 03 C9 00 00
+					39 01 00 00 00 00 03 C8 00 00
+					39 01 00 00 00 00 02 F1 30
+					39 01 00 00 00 00 03 CB 00 00
+					39 01 00 00 00 00 02 F1 30
+					39 01 00 00 00 00 03 CA 00 00
+					39 01 00 00 00 00 02 F1 30
+					39 01 00 00 00 00 03 C9 00 00
+					39 01 00 00 00 00 02 F1 30
+					39 01 00 00 00 00 03 C8 00 00
+					39 01 00 00 00 00 02 F1 60
+					39 01 00 00 00 00 03 CB 00 00
+					39 01 00 00 00 00 02 F1 60
+					39 01 00 00 00 00 03 CA 00 00
+					39 01 00 00 00 00 02 F1 60
+					39 01 00 00 00 00 03 C9 00 00
+					39 01 00 00 00 00 02 F1 60
+					39 01 00 00 00 00 03 C8 00 00
+					39 01 00 00 00 00 08 d8 00 05 00 17 00 05 47
+					39 01 00 00 00 00 02 b0 80
+					39 01 00 00 00 00 02 e6 00
+					39 01 00 00 00 00 02 d6 00 
+					39 01 00 00 00 00 02 b0 00
+					39 01 00 00 00 00 08 b6 02 bb 07 00 1a 0a 1b
+					39 01 00 00 00 00 03 eb 8B 8B
+					39 01 00 00 00 00 02 f7 01
+					39 01 00 00 00 00 5f f8 11 00 00 89 10 80 09 24 04 38 00 14 04 38 04 38 02 00 03 1C 00 20 02 05 00 0F 00 0C 02 67 02 2E 18 00 10 F0 03 0C 20 00 06 0B 0B 33 0E 1C 2A 38 46 54 62 69 70 77 79 7B 7D 7E 01 02 01 00 09 40 09 BE 19 FC 19 FA 19 F8 1A 38 1A 78 1A B6 2A F6 2B 34 2B 74 3B 74 6B F4 00 00 00 00 00 00
+ 					39 01 00 00 00 00 02 35 00
+					39 01 00 00 00 00 03 51 00 00
+					05 01 00 00 8C 00 02 11 00 
+					05 01 00 00 00 00 02 29 00
+				];
+				qcom,mdss-dsi-off-command = [
+					05 01 00 00 64 00 02 28 00  
+					05 01 00 00 32 00 02 10 00];
+				qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
+				qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
+/***********************ACL START*************************/
+                nubia,mdss-dsi-cabc-command-off = [
+                    15 01 00 00 00 00 02 55 00];
+                nubia,mdss-dsi-cabc-command-level1 = [
+                    15 01 00 00 00 00 02 55 01];
+                nubia,mdss-dsi-cabc-command-level2 = [
+                    15 01 00 00 00 00 02 55 02];
+                nubia,mdss-dsi-cabc-command-level3 = [
+                    15 01 00 00 00 00 02 55 03];
+                nubia,mdss-dsi-cabc-command-off-state = "dsi_hs_mode";
+                nubia,mdss-dsi-cabc-command-level1-state = "dsi_hs_mode";
+                nubia,mdss-dsi-cabc-command-level2-state = "dsi_hs_mode";
+                nubia,mdss-dsi-cabc-command-level3-state = "dsi_hs_mode";
+/**********************ACL END****************************/
+/***********************AOD START*************************/
+                nubia,mdss-dsi-aod-command-off = [
+                    39 01 00 00 00 00 02 53 08
+                    15 01 00 00 00 00 02 55 00];
+                nubia,mdss-dsi-aod-command-on = [
+                    39 01 00 00 00 00 02 53 08
+                    15 01 00 00 00 00 02 55 03];
+                nubia,mdss-dsi-aod-command-off-state = "dsi_hs_mode";
+                nubia,mdss-dsi-aod-command-on-state = "dsi_hs_mode";
+/**********************AOD END****************************/
+/***********************HBM START*************************/
+				nubia,mdss-dsi-hbm-fp-command-off = [
+				    39 01 00 00 00 00 02 B0 00
+					15 01 00 00 00 00 02 53 00];
+				nubia,mdss-dsi-hbm-fp-command-on = [
+			        39 01 00 00 00 00 02 B0 00
+					15 01 00 00 00 00 02 53 E8];
+                nubia,mdss-dsi-hbm-command-off = [
+                    39 01 00 00 00 00 02 B0 00
+                    15 01 00 00 00 00 02 53 00];
+                nubia,mdss-dsi-hbm-command-on = [
+                    39 01 00 00 00 00 02 B0 00
+                    15 01 00 00 00 00 02 53 E8];
+			   nubia,mdss-dsi-hbm-fp-command-off-state = "dsi_hs_mode";
+			   nubia,mdss-dsi-hbm-fp-command-on-state = "dsi_hs_mode";
+               nubia,mdss-dsi-hbm-command-off-state = "dsi_hs_mode";
+               nubia,mdss-dsi-hbm-command-on-state = "dsi_hs_mode";
+/**********************HBM END****************************/
+				qcom,mdss-dsi-h-sync-pulse = <0>;
+				qcom,compression-mode = "dsc";
+				qcom,mdss-dsc-slice-height = <2340>;
+				qcom,mdss-dsc-slice-width = <540>;
+				qcom,mdss-dsc-slice-per-pkt = <2>;
+				qcom,mdss-dsc-bit-per-component = <8>;
+				qcom,mdss-dsc-bit-per-pixel = <8>;
+				qcom,mdss-dsc-block-prediction-enable;
+			};
+		};
+	};
+};

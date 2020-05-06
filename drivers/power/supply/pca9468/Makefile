@@ -1,0 +1,1 @@
+obj-$(CONFIG_NUBIA_NXP_CHARGER)	+= pca9468_charger.o pca9468-step-chg.o

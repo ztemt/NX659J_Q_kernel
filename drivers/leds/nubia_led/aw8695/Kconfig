@@ -1,0 +1,9 @@
+#
+# nubia led AW8695 driver configuration
+#
+config AW8695_HAPTIC
+    tristate "Haptic driver for awinic AW8695 series"
+    depends on I2C
+    default y
+    help
+      This option enables support for AW8695 series Haptic Driver.

@@ -1,0 +1,20 @@
+#
+# nubia led driver configuration
+#
+
+menuconfig NUBIA_LED
+	tristate "nubia led driver"
+	default n
+	help
+	  Say Y here if you have a nubia led connected
+	  to your system.
+
+	  If unsure, say N.
+
+if NUBIA_LED
+source "drivers/leds/nubia_led/aw9106_led0/Kconfig"
+source "drivers/leds/nubia_led/aw9106_led1/Kconfig"
+source "drivers/leds/nubia_led/aw22xxx/Kconfig"
+source "drivers/leds/nubia_led/aw8695/Kconfig"
+endif
+

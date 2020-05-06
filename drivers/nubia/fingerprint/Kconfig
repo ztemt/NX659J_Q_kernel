@@ -1,0 +1,12 @@
+################################################# FINGER_PRINTER START
+config  NUBIA_SENSORS_FP
+	tristate "NUBIA FP DEVICE"
+	default y
+
+if NUBIA_SENSORS_FP
+
+source drivers/nubia/fingerprint/goodix/Kconfig
+
+endif
+
+

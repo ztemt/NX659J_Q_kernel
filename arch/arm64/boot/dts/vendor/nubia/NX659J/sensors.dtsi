@@ -1,0 +1,68 @@
+/*
+ * Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+&qupv3_se1_i2c {
+	/delete-node/ nubia@39;
+};
+
+
+&qupv3_se1_i2c {
+	status = "ok";
+	/delete-node/ nq@28;
+	stk@47 {
+		compatible = "stk,stk3x3x";
+		reg = <0x47>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <122 0x2>;
+		vdd-supply = <&pm8150a_l10>; /*3.0v*/
+		vio-supply = <&pm8150a_l8>; /*1.8v*/
+		pinctrl-names = "stk_irq_active","stk_irq_suspend";
+		pinctrl-0 = <&stk_irq_active>;
+		pinctrl-1 = <&stk_irq_suspend>;
+		stk,irq-gpio = <&tlmm 122 0x02>;
+		stk,state-reg = <0x0>;
+		stk,psctrl-reg = <0x30>;
+		stk,alsctrl-reg = <0x22>;
+		stk,ledctrl-reg = <0xA0>;
+		stk,wait-reg = <0x3F>;
+		stk,ps-thdh = <8200>;
+		stk,ps-thdl = <8000>;
+		stk,transmittance = <1000>;
+		stk,use-fir;
+	};
+
+};
+
+&pm8150a_l10 {
+     status = "ok";
+     qcom,init-voltage = <3000000>;
+     regulator-always-on;
+};
+
+&tlmm {
+	stk_int_pin {
+		stk_irq_active: stk_irq_active {
+			config {
+				pins = "gpio122";
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+		stk_irq_suspend: stk_irq_suspend {
+			config {
+				pins = "gpio122";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+	};
+};

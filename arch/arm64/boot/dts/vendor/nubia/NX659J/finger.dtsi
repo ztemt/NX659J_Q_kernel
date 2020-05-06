@@ -1,0 +1,166 @@
+/*
+ * Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+&soc {
+       /* used for fingerprint device as platform device added by nubia start*/
+       goodix_fp{
+                compatible = "goodix,fingerprint";
+                interrupt-parent = <&tlmm>;
+                pinctrl-names = "gf_fp_active", "gf_fp_suspend";
+                pinctrl-0 = <&goodix_pwr_avdd_active &goodix_pwr_vddio_active &goodix_reset_active &goodix_irq_active &goodix_id_active>;
+                pinctrl-1 = <&goodix_pwr_avdd_sleep &goodix_pwr_vddio_sleep &goodix_reset_sleep &goodix_irq_sleep &goodix_id_sleep>;
+                goodix,goodix_reset = <&tlmm 119 0>;
+                goodix,goodix_irq = <&tlmm 23 0>;
+                goodix,goodix_id = <&tlmm 91 0x00>;
+                goodix,goodix_pwr_avdd = <&tlmm 118 0>;
+                goodix,goodix_pwr_vddio = <&tlmm 127 0>;
+                status = "ok";
+        };
+       /* used for fingerprint device as platform device added by nubia end*/
+};
+
+/*****finger pinctrl start *****/
+&tlmm {
+		goodix_pwr_avdd {
+			goodix_pwr_avdd_active: goodix_pwr_avdd_active {
+				mux {
+					pins = "gpio118";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio118";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+
+			goodix_pwr_avdd_sleep: goodix_pwr_avdd_sleep {
+				mux {
+					pins = "gpio118";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio118";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		goodix_pwr_vddio {
+			goodix_pwr_vddio_active: goodix_pwr_vddio_active {
+				mux {
+					pins = "gpio127";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio127";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+
+			goodix_pwr_vddio_sleep: goodix_pwr_vddio_sleep {
+				mux {
+					pins = "gpio127";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio127";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		goodix_reset {
+			goodix_reset_active: goodix_reset_active {
+				mux {
+					pins = "gpio119";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio119";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+
+			goodix_reset_sleep: goodix_reset_sleep {
+				mux {
+					pins = "gpio119";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio119";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+		goodix_irq {
+			goodix_irq_active: goodix_irq_active {
+				mux {
+					pins = "gpio23";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio23";
+					drive-strength = <6>;
+					bias-pull-down;
+					input-enable;
+				};
+			};
+
+			goodix_irq_sleep: goodix_irq_sleep {
+				mux {
+					pins = "gpio23";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio23";
+					drive-strength = <6>;
+					bias-pull-down;
+					input-enable;
+				};
+			};
+		};
+
+		goodix_id {
+			goodix_id_active: goodix_id_active {
+				mux {
+					pins = "gpio91";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio91";
+					drive-strength = <6>;
+					bias-pull-down;
+					input-enable;
+				};
+			};
+
+			goodix_id_sleep: goodix_id_sleep {
+				mux {
+					pins = "gpio91";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio91";
+					drive-strength = <6>;
+					bias-pull-down;
+					input-enable;
+				};
+			};
+		};
+};
+/*****finger pinctrl end *****/

@@ -1,0 +1,77 @@
+/*
+ * nubia overwrite dts
+ */
+&qupv3_se5_i2c{
+	status = "ok";
+	aw22xxx_led@6a {
+		status = "okay";
+		compatible = "awinic,aw22xxx_led";
+		reg = <0x6a>;
+		reset-gpio = <&tlmm 14 0x0>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <15 0x2002>;
+		irq-gpio = <&tlmm 15 0x2002>;
+		pinctrl-names = "aw22xxx_led_default", "aw22xxx_led_sleep";
+		pinctrl-0 = <&aw22xxx_int_active &aw22xxx_reset_active>;
+		pinctrl-1 = <&aw22xxx_int_suspend &aw22xxx_reset_suspend>;
+		aw22xxx,led {
+			aw22xxx,name = "aw22xxx_led";
+			aw22xxx,imax = <8>;
+			aw22xxx,brightness = <128>;	
+			aw22xxx,max_brightness = <255>;
+		};
+	};
+};
+
+&tlmm{
+		aw22xxx_reset {
+			aw22xxx_reset_active: aw22xxx_reset_active {
+				mux {
+					pins = "gpio14";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio14";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+			
+			aw22xxx_reset_suspend: aw22xxx_reset_suspend {
+				mux {
+					pins = "gpio14";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio14";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		aw22xxx_int {
+			aw22xxx_int_active: aw22xxx_int_active {
+				mux {
+					pins = "gpio15";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio15";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+			aw22xxx_int_suspend: aw22xxx_int_suspend {
+				mux {
+					pins = "gpio15";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio15";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+};

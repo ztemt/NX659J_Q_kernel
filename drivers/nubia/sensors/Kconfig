@@ -1,0 +1,17 @@
+################################################# SENROS LOG
+
+config FEATURE_NUBIA_SENSORS_LOG_ON
+	tristate "NUBIA SENSORS LOG ON"
+	depends on NUBIA_SENSORS
+	default n
+	help
+		If you want to enable the sensor log,
+
+################################################# STK3332_PROXIMITY_AND_LIGHT
+config NUBIA_SENSORS_STK3337
+	tristate "support proximity/light driver"
+	depends on NUBIA_SENSORS
+	default n
+	help
+		nubia device of ambient&&prox
+

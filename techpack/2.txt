@@ -1,0 +1,123 @@
+diff --git a/techpack/display/msm/dsi/dsi_defs.h b/techpack/display/msm/dsi/dsi_defs.h
+index 25efe72..1f66ffe 100755
+--- a/techpack/display/msm/dsi/dsi_defs.h
++++ b/techpack/display/msm/dsi/dsi_defs.h
+@@ -311,6 +311,7 @@ enum dsi_cmd_set_type {
+ 	DSI_CMD_SET_DFPS_60,
+ 	DSI_CMD_SET_DFPS_90,
+ 	DSI_CMD_SET_DFPS_120,
++	DSI_CMD_SET_DFPS_144,
+ #endif
+ 	DSI_CMD_SET_MAX
+ };
+diff --git a/techpack/display/msm/dsi/dsi_panel.c b/techpack/display/msm/dsi/dsi_panel.c
+index 0308169..85c44a4 100755
+--- a/techpack/display/msm/dsi/dsi_panel.c
++++ b/techpack/display/msm/dsi/dsi_panel.c
+@@ -1806,6 +1806,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
+ 	"qcom,mdss-dsi-on-command-60",
+ 	"qcom,mdss-dsi-on-command-90",
+ 	"qcom,mdss-dsi-on-command-120",
++	"qcom,mdss-dsi-on-command-144",
+ #endif
+ };
+ 
+@@ -1853,6 +1854,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
+ 	"qcom,mdss-dsi-on-command-60-state",
+         "qcom,mdss-dsi-on-command-90-state",
+         "qcom,mdss-dsi-on-command-120-state",
++		"qcom,mdss-dsi-on-command-144-state",
+ #endif
+ };
+ 
+@@ -3531,7 +3533,7 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 		cmd3[1] = osc_value_120;
+ 	switch(dfps){
+ 		case DFPS_60:
+-			if (fps_temp == 120){
++			if (fps_temp == 120 || fps_temp == 144){
+ 				/*rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_OFF);
+ 				msleep(200);*/
+ 				mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
+@@ -3549,7 +3551,7 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 			}
+ 			break;
+ 		case DFPS_90:
+-			if (fps_temp == 120){
++			if (fps_temp == 120 ||fps_temp == 144){
+ 				/*rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_OFF);
+ 				msleep(200);*/
+ 				mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
+@@ -3590,6 +3592,18 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 					panel->name, rc);
+ 			}
+ 			break;
++		case DFPS_144:
++			mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
++			mipi_dsi_dcs_write(dsi, 0xE8, cmd2, sizeof(cmd2));
++			mipi_dsi_dcs_write(dsi, 0xE4, cmd3, sizeof(cmd3));
++			mipi_dsi_dcs_write(dsi, 0xB0, cmd4, sizeof(cmd4));
++			mipi_dsi_dcs_write(dsi, 0xC7, gamma1,sizeof(gamma1));
++			mipi_dsi_dcs_write(dsi, 0xC8, gamma2, sizeof(gamma2));
++			mipi_dsi_dcs_write(dsi, 0xC9, gamma3, sizeof(gamma3));
++			mipi_dsi_dcs_write(dsi, 0xCA, gamma4, sizeof(gamma4));
++			mipi_dsi_dcs_write(dsi, 0xCB, gamma5, sizeof(gamma5));
++			rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_DFPS_144);
++			rc = dsi_panel_update_backlight(panel, bl_lvl_tmp);
+ 		default:
+ 			break;
+ 	}
+@@ -4795,7 +4809,7 @@ int dsi_panel_enable(struct dsi_panel *panel)
+ 		mipi_dsi_dcs_write(dsi, 0xE4, cmd3, sizeof(cmd3));
+ 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_ON);
+ 		rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_DFPS_60);	
+-	}else{
++	}else if(fps_store == 120){
+ 		rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_DFPS_120);
+ 		mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
+         mipi_dsi_dcs_write(dsi, 0xE8, cmd2, sizeof(cmd2));
+@@ -4806,6 +4820,17 @@ int dsi_panel_enable(struct dsi_panel *panel)
+ 		mipi_dsi_dcs_write(dsi, 0xC9, gamma3, sizeof(gamma3));
+ 		mipi_dsi_dcs_write(dsi, 0xCA, gamma4, sizeof(gamma4));
+ 		mipi_dsi_dcs_write(dsi, 0xCB, gamma5, sizeof(gamma5));
++	}else{
++		rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_DFPS_144);
++		mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
++		mipi_dsi_dcs_write(dsi, 0xE8, cmd2, sizeof(cmd2));
++		mipi_dsi_dcs_write(dsi, 0xE4, cmd3, sizeof(cmd3));
++		mipi_dsi_dcs_write(dsi, 0xB0, cmd4, sizeof(cmd4));
++		mipi_dsi_dcs_write(dsi, 0xC7, gamma1,sizeof(gamma1));
++		mipi_dsi_dcs_write(dsi, 0xC8, gamma2, sizeof(gamma2));
++		mipi_dsi_dcs_write(dsi, 0xC9, gamma3, sizeof(gamma3));
++		mipi_dsi_dcs_write(dsi, 0xCA, gamma4, sizeof(gamma4));
++		mipi_dsi_dcs_write(dsi, 0xCB, gamma5, sizeof(gamma5));
+ 	}
+ #else
+ 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_ON);
+diff --git a/techpack/display/msm/nubia_disp_preference.c b/techpack/display/msm/nubia_disp_preference.c
+index ba0a0ab..2a0076c 100755
+--- a/techpack/display/msm/nubia_disp_preference.c
++++ b/techpack/display/msm/nubia_disp_preference.c
+@@ -192,7 +192,7 @@ static ssize_t dfps_store(struct kobject *kobj,
+ 		return size;
+ 	else
+ 		fps_store = val;
+-	if ((val != DFPS_60) && (val != DFPS_90) && (val !=DFPS_120)) {
++	if ((val != DFPS_60) && (val != DFPS_90) && (val != DFPS_120) && (val != DFPS_144)) {
+ 		NUBIA_DISP_ERROR("invalid dfps val = %d\n", val);
+ 		return size;
+ 	}
+diff --git a/techpack/display/msm/nubia_disp_preference.h b/techpack/display/msm/nubia_disp_preference.h
+index 0cd018d..7593d79 100755
+--- a/techpack/display/msm/nubia_disp_preference.h
++++ b/techpack/display/msm/nubia_disp_preference.h
+@@ -39,7 +39,8 @@ enum{
+ enum{
+ 	DFPS_60 = 60,
+ 	DFPS_90 = 90,
+-	DFPS_120 = 120
++	DFPS_120 = 120,
++	DFPS_144 = 144
+ };
+ #define NUBIA_DISP_LOG_TAG "ZtemtDisp"
+ #define NUBIA_DISP_LOG_ON

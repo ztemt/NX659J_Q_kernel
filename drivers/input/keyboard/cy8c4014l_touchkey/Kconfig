@@ -1,0 +1,9 @@
+
+
+config NUBIA_CYPRESS_KEYBOARD_GAMEFIRE
+        tristate "Keypad NUBIA GameFire"
+        depends on KEYBOARD_GPIO
+	default y
+        help
+          Addr GameSwitchkey attr
+

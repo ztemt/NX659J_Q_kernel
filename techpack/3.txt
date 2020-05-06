@@ -1,0 +1,335 @@
+diff --git a/techpack/display/msm/dsi/dsi_display.c b/techpack/display/msm/dsi/dsi_display.c
+index 5f0411b..8ecf964 100755
+--- a/techpack/display/msm/dsi/dsi_display.c
++++ b/techpack/display/msm/dsi/dsi_display.c
+@@ -621,6 +621,46 @@ static bool dsi_display_validate_reg_read(struct dsi_panel *panel)
+ 	return false;
+ }
+ 
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++static bool dsi_display_demura_cheksum(struct dsi_panel *panel)
++{
++	int i = 0;
++	int len = 0;
++	struct drm_panel_esd_config *config;
++
++	if (!panel)
++		return false;
++
++	config = &(panel->esd_config);
++	len = DEMURA_CHECK_NUM;
++
++	if (panel->cur_fps == FPS_60 || panel->cur_fps == FPS_90) {
++		for (i = 0; i < len; ++i) {
++			if (config->demura_checksum[i] !=
++				panel->demura_checksum_90[i]) {
++				DRM_ERROR("mismatch_demura_90: 0x%x\n",
++						config->demura_checksum[i]);
++				break;
++			}
++		}
++	} else {
++		for (i = 0; i < len; ++i) {
++			if (config->demura_checksum[i] !=
++				panel->demura_checksum_120[i]) {
++				DRM_ERROR("mismatch_demura_120: 0x%x\n",
++						config->demura_checksum[i]);
++				break;
++			}
++		}
++	}
++
++	if (i == len)
++		return true;
++
++	return false;
++}
++#endif
++
+ static void dsi_display_parse_te_data(struct dsi_display *display)
+ {
+ 	struct platform_device *pdev;
+@@ -708,6 +748,47 @@ static int dsi_display_read_status(struct dsi_display_ctrl *ctrl,
+ 	return rc;
+ }
+ 
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++int dsi_display_read_demura(struct dsi_panel *panel)
++{
++	int rc = 0;
++	int i = 0;
++	int count = DEMURA_CHECK_NUM;
++	u8 cmd1[1] = {0x00};
++	u8 *rx_buf = NULL;
++	struct mipi_dsi_device *dsi;
++
++	if (!panel) {
++		DSI_ERR("Invalid params\n");
++		return -EINVAL;
++	}
++
++	mutex_lock(&panel->panel_lock);
++
++	dsi = &panel->mipi_device;
++	rx_buf = (u8*)kzalloc(10, GFP_KERNEL);
++	if (ZERO_OR_NULL_PTR(rx_buf))
++		return -ENOMEM;
++
++	rc = mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
++	rc = dsi_panel_read_data(dsi, 0xE7, rx_buf, count);
++	if (!rc) {
++		DSI_ERR("dsi panel read demura data failed rc=%d\n", rc);
++		goto error;
++	}
++
++	for (i = 0; i < count; i++) {
++		printk(">>>>demura_status:[%d] = %x \n",i,rx_buf[i]);
++		panel->esd_config.demura_checksum[i] = rx_buf[i];
++	}
++
++error:
++	kfree(rx_buf);
++	mutex_unlock(&panel->panel_lock);
++	return rc;
++}
++#endif
++
+ static int dsi_display_validate_status(struct dsi_display_ctrl *ctrl,
+ 		struct dsi_panel *panel)
+ {
+@@ -728,6 +809,23 @@ static int dsi_display_validate_status(struct dsi_display_ctrl *ctrl,
+ 		}
+ 	}
+ 
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++	rc = dsi_display_read_demura(panel);
++	if (rc) {
++		goto exit;
++	} else {
++		/*
++		 * panel demura read successfully.
++		 * check for validity of the data read back.
++		 */
++		rc = dsi_display_demura_cheksum(panel);
++		if (!rc) {
++			rc = -EINVAL;
++			goto exit;
++		}
++	}
++#endif
++
+ exit:
+ 	return rc;
+ }
+@@ -5251,6 +5349,7 @@ int dsi_display_dev_probe(struct platform_device *pdev)
+ #ifdef CONFIG_NUBIA_DISP_PREFERENCE
+ 		if(!strcmp(boot_disp->name, "qcom,nubia_dsi_r66455_1080p_amoled_cmd") || !strcmp(boot_disp->name, "qcom,nubia_dsi_r66451_1080p_amoled_cmd")) {
+ 			nubia_set_dsi_ctrl(display);
++			display->panel->get_demura_checksum_120 = false;
+ 		}
+ #endif
+ 		/* The panel name should be same as UEFI name index */
+@@ -7260,6 +7359,8 @@ int dsi_display_read_osc_value(struct dsi_display *display)
+ 	u8 cmd1[1] = {0x04};
+ 	u8 cmd2[4] = {0x00,0x00,0x00,0x02};
+ 	u8 *rx_buf = NULL;
++	u8 *rx_buf2 = NULL;
++
+ 	if (!display || !display->panel) {
+ 		DSI_ERR("Invalid params\n");
+ 		return -EINVAL;
+@@ -7267,17 +7368,28 @@ int dsi_display_read_osc_value(struct dsi_display *display)
+ 
+ 	dsi = &display->panel->mipi_device;
+ 	rx_buf = (u8*)kzalloc(20, GFP_KERNEL);
++	rx_buf2 = (u8*)kzalloc(10, GFP_KERNEL);
++/*	if (ZERO_OR_NULL_PTR(rx_buf) || ZERO_OR_NULL_PTR(rx_buf2))
++		return -ENOMEM;
++*/
+ 	rc = mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
+ 	rc = mipi_dsi_dcs_write(dsi, 0xE8, cmd2, sizeof(cmd2));
+ 	rc = dsi_panel_read_data(dsi, 0xE4, rx_buf, 20);
++	rc = dsi_panel_read_data(dsi, 0xE7, rx_buf2, 7);
++
+ 
+ 	for (i = 0; i < 20; i++)
+-	{
+ 		printk(">>>>rx_buf[%d] = %x",i,rx_buf[i]);
++
++	for (i = 0; i < 7; i++) {
++		printk(">>>>rx_buf2[%d] = %x \n",i,rx_buf2[i]);
++		display->panel->demura_checksum_90[i] = rx_buf2[i];
+ 	}
+ 	osc_value_90 = rx_buf[1];
+ 	osc_value_120 = rx_buf[19];
+ 	kfree(rx_buf);
++	kfree(rx_buf2);
++
+ 	return rc;
+ }
+ 
+@@ -7318,7 +7430,11 @@ int dsi_display_read_gamma_value(struct dsi_display *display)
+ 	rx_buf2 = (u8 *)kzalloc(144, GFP_KERNEL);
+ 	rx_buf3 = (u8 *)kzalloc(144, GFP_KERNEL);
+ 	rx_buf4 = (u8 *)kzalloc(144, GFP_KERNEL);
+-/***write enable for volatile status register****/
++/*	if (ZERO_OR_NULL_PTR(rx_buf) || ZERO_OR_NULL_PTR(rx_buf1)  || ZERO_OR_NULL_PTR(rx_buf2)
++		|| ZERO_OR_NULL_PTR(rx_buf3) || ZERO_OR_NULL_PTR(rx_buf4))
++		return -ENOMEM;
++*/
++	/***write enable for volatile status register****/
+ 	mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
+ 	mipi_dsi_dcs_write(dsi, 0xF1, cmd2, sizeof(cmd2));
+ 	mipi_dsi_dcs_write(dsi, 0xDF, cmd3, sizeof(cmd3));
+diff --git a/techpack/display/msm/dsi/dsi_panel.c b/techpack/display/msm/dsi/dsi_panel.c
+index 0308169..527bfad 100755
+--- a/techpack/display/msm/dsi/dsi_panel.c
++++ b/techpack/display/msm/dsi/dsi_panel.c
+@@ -161,6 +161,8 @@ void dsi_panel_notifier(int event, unsigned long data)
+ 	msm_drm_panel_notifier_call_chain(event,
+                                &notifier_data);
+ }
++
++//int dsi_panel_get_demura(struct dsi_panel *panel);
+ #endif
+ int dsi_dsc_create_pps_buf_cmd(struct msm_display_dsc_info *dsc, char *buf,
+ 				int pps_id)
+@@ -3547,6 +3549,7 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 						panel->name, rc);
+ 				}
+ 			}
++			panel->cur_fps = FPS_60;
+ 			break;
+ 		case DFPS_90:
+ 			if (fps_temp == 120){
+@@ -3565,6 +3568,7 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 						panel->name, rc);
+ 				}
+ 			}
++			panel->cur_fps = FPS_90;
+ 			break;
+ 		case DFPS_120:
+ 			/*rc = dsi_panel_tx_cmd_set(panel,DSI_CMD_SET_OFF);
+@@ -3585,10 +3589,14 @@ int nubia_dsi_panel_dfps(struct dsi_panel *panel, uint32_t dfps)
+ 			mipi_dsi_dcs_write(dsi, 0xC9, gamma3, sizeof(gamma3));
+ 			mipi_dsi_dcs_write(dsi, 0xCA, gamma4, sizeof(gamma4));
+ 			mipi_dsi_dcs_write(dsi, 0xCB, gamma5, sizeof(gamma5));*/
++			if (!rc && !panel->get_demura_checksum_120)
++				dsi_panel_get_demura(panel);
++
+ 			if(rc) {
+ 				pr_err("[%s] failed to send DSI_CMD_SET_DFPS_120 cmds, rc=%d\n",
+ 					panel->name, rc);
+ 			}
++			panel->cur_fps = FPS_120;
+ 			break;
+ 		default:
+ 			break;
+@@ -4759,6 +4767,44 @@ int dsi_panel_write_data(struct mipi_dsi_device *dsi, u8 cmd, void* buf, size_t
+ 	rc = mipi_dsi_dcs_write(dsi, cmd, buf, len);
+ 	return rc;
+ }
++
++int dsi_panel_get_demura(struct dsi_panel *panel)
++{
++	int rc = 0;
++	int i = 0;
++	u8 cmd1[1] = {0x00};
++	u8 *rx_buf = NULL;
++	struct mipi_dsi_device *dsi;
++
++	if (!panel) {
++		DSI_ERR("Invalid params\n");
++		return -EINVAL;
++	}
++
++	mutex_lock(&panel->panel_lock);
++
++	dsi = &panel->mipi_device;
++	rx_buf = (u8*)kzalloc(10, GFP_KERNEL);
++	rc = mipi_dsi_dcs_write(dsi, 0xB0, cmd1, sizeof(cmd1));
++	rc = dsi_panel_read_data(dsi, 0xE7, rx_buf, 7);
++	if (!rc) {
++		DSI_ERR("dsi panel read demura data failed rc=%d\n", rc);
++		goto error;
++	}
++
++	for (i = 0; i < 7; i++) {
++		printk(">>>>demura_90:rx_buf[%d] = %x \n",i,rx_buf[i]);
++		panel->demura_checksum_120[i] = rx_buf[i];
++	}
++
++	panel->get_demura_checksum_120 = true;
++
++error:
++	kfree(rx_buf);
++
++	mutex_unlock(&panel->panel_lock);
++	return rc;
++}
+ #endif
+ 
+ int dsi_panel_enable(struct dsi_panel *panel)
+diff --git a/techpack/display/msm/dsi/dsi_panel.h b/techpack/display/msm/dsi/dsi_panel.h
+index 3886876..f4c0e19 100755
+--- a/techpack/display/msm/dsi/dsi_panel.h
++++ b/techpack/display/msm/dsi/dsi_panel.h
+@@ -28,6 +28,10 @@
+ 
+ #define DSI_MODE_MAX 32
+ 
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++#define DEMURA_CHECK_NUM 7
++#endif
++
+ enum dsi_panel_rotation {
+ 	DSI_PANEL_ROTATE_NONE = 0,
+ 	DSI_PANEL_ROTATE_HV_FLIP,
+@@ -144,6 +148,16 @@ enum esd_check_status_mode {
+ 	ESD_MODE_MAX
+ };
+ 
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++enum current_fps {
++	FPS_60,
++	FPS_90,
++	FPS_120,
++	FPS_144,
++	FPS_MAX
++};
++#endif
++
+ struct drm_panel_esd_config {
+ 	bool esd_enabled;
+ 
+@@ -155,6 +169,9 @@ struct drm_panel_esd_config {
+ 	u8 *return_buf;
+ 	u8 *status_buf;
+ 	u32 groups;
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++	u32 demura_checksum[DEMURA_CHECK_NUM]; /* stautus demura esd checksum */
++#endif
+ };
+ 
+ struct dsi_panel {
+@@ -196,6 +213,12 @@ struct dsi_panel {
+ 	bool ulps_suspend_enabled;
+ 	bool allow_phy_power_off;
+ 	atomic_t esd_recovery_pending;
++#ifdef CONFIG_NUBIA_DISP_PREFERENCE
++	u32 demura_checksum_90[DEMURA_CHECK_NUM]; /* 60/90Hz demura esd checksum */
++	bool get_demura_checksum_120;
++	u32 demura_checksum_120[DEMURA_CHECK_NUM]; /* 120/144Hz demura esd checksum */
++	enum current_fps cur_fps;
++#endif
+ 
+ 	bool panel_initialized;
+ 	bool te_using_watchdog_timer;
+@@ -331,6 +354,7 @@ void dsi_panel_calc_dsi_transfer_time(struct dsi_host_common_cfg *config,
+ 
+ #ifdef CONFIG_NUBIA_DISP_PREFERENCE
+ int nubia_dsi_panel_cabc(struct dsi_panel *panel, uint32_t cabc_modes);
++int dsi_panel_get_demura(struct dsi_panel *panel);
+ #endif
+ #ifdef CONFIG_NUBIA_AOD_HBM_MODE
+ int nubia_dsi_panel_aod(struct dsi_panel *panel, uint32_t aod_modes);

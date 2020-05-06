@@ -1,0 +1,9 @@
+#
+# ZTE SoC drivers
+#
+
+config NUBIA_USB_DP_MODULES
+	bool "NUBIA USB DP MODULES"
+	default y
+	help
+	  usb switch to dp function

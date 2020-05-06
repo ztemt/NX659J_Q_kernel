@@ -1,0 +1,22 @@
+#
+# Fan driver configuration
+#
+menuconfig FAN
+	bool "Fan"
+	default n
+	help
+	  Say Y here if you have a Fan connected
+	  to your system.
+
+	  If unsure, say N.
+
+if FAN
+
+config FAN_CORE
+	bool "Fan core"
+	default n
+#config FAN_UPDATA
+#	bool "Fan updata"
+#	default n
+
+endif

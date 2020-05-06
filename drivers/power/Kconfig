@@ -1,0 +1,6 @@
+source "drivers/power/avs/Kconfig"
+source "drivers/power/reset/Kconfig"
+source "drivers/power/supply/Kconfig"
+#Begin [0016004715 add the kernel power code,20180316]
+source "drivers/power/ztemt_power_debug/Kconfig"
+#End   [0016004715 add the kernel power code,20180316]

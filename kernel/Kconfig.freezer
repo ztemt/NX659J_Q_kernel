@@ -1,0 +1,8 @@
+config FREEZER
+	def_bool PM_SLEEP || CGROUP_FREEZER
+
+config CPU_PRESSURE_MONITOR
+        bool "cpu pressure monitor"
+        help
+          Provides a way to monitor cpu pressure
+        default y

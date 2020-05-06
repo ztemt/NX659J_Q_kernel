@@ -1,0 +1,11 @@
+config NUBIA_NXP_CHARGER
+	tristate "TI pca9468 battery charger driver"
+	default y
+	help
+	  Say Y to enable support for TI pca9468 charger
+config USBPD_PHY_QCOM
+	tristate "TI pca9468 battery charger driver"
+	default y
+	help
+	  Say Y to enable support for TI pca9468 charger
+	  

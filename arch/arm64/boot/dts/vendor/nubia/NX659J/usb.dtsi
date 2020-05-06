@@ -1,0 +1,50 @@
+/*
+ * nubia overrides dts
+ */
+&usb2_phy0 {
+        qcom,param-override-seq = <0x63 0x6c
+				   0x45 0x70>;
+};
+
+&usb1 {
+	extcon = <&extcon_usb1>;
+	status = "ok";
+	dwc3@a800000 {
+		usb-phy = <&usb2_phy1>, <&usb_nop_phy>;
+		maximum-speed = "high-speed";
+	};
+};
+
+&tlmm {
+	usb2_id_det_on: usb2_id_det_on {
+		config {
+			pins = "gpio84";
+			function = "gpio";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+        usb2_id_det_off: usb2_id_det_off {
+                config {
+			pins = "gpio84";
+			function = "gpio";
+			input-enable;
+			bias-pull-down;
+		};
+	};
+};
+
+&extcon_usb1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&usb2_vbus_det_default
+		     &usb2_id_det_on
+		     &usb2_vbus_boost_default>;
+	pinctrl-1 = <&usb2_vbus_det_default
+		     &usb2_id_det_off
+		     &usb2_vbus_boost_default>;
+};
+
+&usb2_phy1 {
+	status = "ok";
+};
+

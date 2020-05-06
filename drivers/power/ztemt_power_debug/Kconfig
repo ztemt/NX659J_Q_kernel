@@ -1,0 +1,6 @@
+config ZTEMT_POWER_DEBUG
+	bool "ZTEMT Power Debug Feature"
+	default n
+	help
+	  ZTEMT Power Debug Feature
+

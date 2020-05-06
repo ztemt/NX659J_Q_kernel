@@ -1,0 +1,12 @@
+#
+# nubia led aw9106 driver configuration
+#
+
+config NUBIA_LED_AW22XXX
+	bool "nubia led aw22xxx driver"
+	default n
+	help
+	  Say Y here if you have a nubia led aw22xxx connected
+	  to your system.
+
+	  If unsure, say N.
